@@ -14,6 +14,8 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // For Laravel 11, policies auto-discover; explicit register not required
-        Gate::define('isAdmin', fn($user) => $user->role === 'admin');
+        Gate::define('isAdmin', function ($user) {
+            return strtolower($user->role ?? '') === 'admin';
+        });
     }
 }

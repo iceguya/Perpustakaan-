@@ -59,7 +59,7 @@ class AuthController extends Controller
             'member_id' => $memberId,
         ]);
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('api', ['*'])->plainTextToken;
 
         return response()->json(['token' => $token, 'user' => $user->load('member')], 201);
     }
@@ -91,7 +91,7 @@ class AuthController extends Controller
         if (!$user || !Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages(['identifier' => 'Kredensial salah']);
         }
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('api', ['*'])->plainTextToken;
         return response()->json(['token' => $token, 'user' => $user->load('member')]);
     }
 

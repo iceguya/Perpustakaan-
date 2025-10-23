@@ -42,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/read/history',                [ReadController::class, 'history']);
 
     // ---------- ADMIN AREA ----------
-    Route::prefix('admin')->middleware('can:isAdmin')->group(function () {
+    Route::prefix('admin')->group(function () {
         // Borrow moderation
         Route::get('/borrows',                         [BorrowController::class, 'index']);       // ?status=pending|approved|...
         Route::post('/borrows/{borrow}/approve',       [BorrowController::class, 'approve']);

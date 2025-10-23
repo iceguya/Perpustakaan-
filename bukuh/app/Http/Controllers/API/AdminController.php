@@ -9,6 +9,16 @@ use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (strtolower($request->user()->role ?? '') !== 'admin') {
+                return response()->json(['message' => 'Hanya admin yang dapat mengakses endpoint ini.'], 403);
+            }
+            return $next($request);
+        });
+    }
+
     // CRUD Buku
     public function index() { return Book::latest()->paginate(20); }
     public function store(Request $r) {
