@@ -17,31 +17,32 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Test User',
+            'username' => 'tester',
             'email' => 'test@example.com',
         ]);
 
-            \App\Models\User::factory()->create([
-        'name' => 'Admin',
-        'email' => 'admin@lib.test',
-        'password' => bcrypt('password'),
-        'role' => 'admin',
-    ]);
+        User::factory()->create([
+            'name' => 'Admin',
+            'username' => 'admin',
+            'email' => 'admin@lib.test',
+            'password' => bcrypt('password'),
+            'role' => 'admin',
+        ]);
 
-    \App\Models\User::factory()->create([
-        'name' => 'User',
-        'email' => 'user@lib.test',
-        'password' => bcrypt('password'),
-        'role' => 'user',
-    ]);
+        User::factory()->create([
+            'name' => 'User',
+            'username' => 'user',
+            'email' => 'user@lib.test',
+            'password' => bcrypt('password'),
+            'role' => 'user',
+        ]);
 
-    $this->call([
-        MemberSeeder::class,
-        BookSeeder::class,
-    ]);
+        $this->call([
+            MemberSeeder::class,
+            BookSeeder::class,
+        ]);
     }
 
     
 }
-
-
 
