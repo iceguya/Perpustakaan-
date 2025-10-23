@@ -64,6 +64,21 @@ export default function Home({ user }) {
     }
   }
 
+  function handleReadDigital(book) {
+    if (!user) {
+      alert('Silakan masuk untuk membaca koleksi digital.')
+      return
+    }
+    const url = (book?.file_url || '').trim()
+    if (!url) {
+      alert('File digital belum tersedia untuk buku ini.')
+      return
+    }
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
+  }
+
   return (
     <div className="space-y-12">
       <section id="catalog" className="space-y-6">
@@ -110,7 +125,13 @@ export default function Home({ user }) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {books.map((book) => (
-              <BookCard key={book.id} book={book} onBorrow={handleBorrow} disabled={catalogLoading} />
+              <BookCard
+                key={book.id}
+                book={book}
+                onBorrow={handleBorrow}
+                onRead={handleReadDigital}
+                disabled={catalogLoading}
+              />
             ))}
           </div>
         )}

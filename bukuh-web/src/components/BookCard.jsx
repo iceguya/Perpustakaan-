@@ -1,11 +1,21 @@
 import React from 'react'
 import { Icons } from './Icon'
 
-export default function BookCard({ book, onBorrow, disabled }) {
+export default function BookCard({ book, onBorrow, onRead, disabled }) {
   const isDigital = Boolean(book?.is_digital)
+  const hasFile = Boolean(book?.file_url)
   const canBorrow = typeof onBorrow === 'function'
   const handleBorrow = () => {
     if (canBorrow) onBorrow(book)
+  }
+  const handleRead = () => {
+    if (typeof onRead === 'function') {
+      onRead(book)
+      return
+    }
+    if (hasFile && typeof window !== 'undefined') {
+      window.open(book.file_url, '_blank', 'noopener,noreferrer')
+    }
   }
 
   return (
@@ -43,9 +53,21 @@ export default function BookCard({ book, onBorrow, disabled }) {
         </button>
       )}
       {isDigital && (
-        <div className="text-xs opacity-70">
-          Buku digital dapat dibaca langsung dan progress-nya tercatat otomatis.
-        </div>
+        <>
+          <button
+            type="button"
+            className="btn !py-1.5 justify-center"
+            onClick={handleRead}
+            disabled={disabled || (!hasFile && typeof onRead !== 'function')}
+          >
+            <Icons.BookMarked size={16} /> Baca Digital
+          </button>
+          {!hasFile && (
+            <div className="text-xs opacity-70">
+              File digital belum tersedia. Hubungi petugas perpustakaan.
+            </div>
+          )}
+        </>
       )}
     </div>
   )

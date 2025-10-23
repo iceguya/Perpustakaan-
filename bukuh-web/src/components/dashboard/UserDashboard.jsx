@@ -106,6 +106,17 @@ export default function UserDashboard({ user, refreshToken, onNeedRefresh }) {
     }
   }
 
+  function handleOpenDigitalBook(book) {
+    const url = (book?.file_url || '').trim()
+    if (!url) {
+      alert('File digital belum tersedia untuk buku ini.')
+      return
+    }
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
+  }
+
   const activeBorrows = useMemo(() => borrows.filter((item) => item.status === 'approved'), [borrows])
 
   return (
@@ -232,12 +243,30 @@ export default function UserDashboard({ user, refreshToken, onNeedRefresh }) {
               items={readHistory.digital}
               emptyText="Belum ada progress baca digital."
               renderItem={(item) => (
-                <div>
-                  <div className="font-medium">{item.book?.title ?? 'Buku #' + item.book_id}</div>
-                  <div className="text-xs opacity-70">
-                    Halaman {item.current_page} dari {item.total_pages} - diperbarui{' '}
-                    {new Date(item.updated_at).toLocaleString()}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-medium">{item.book?.title ?? 'Buku #' + item.book_id}</div>
+                      <div className="text-xs opacity-70">
+                        Halaman {item.current_page} dari {item.total_pages} · diperbarui{' '}
+                        {new Date(item.updated_at).toLocaleString()}
+                      </div>
+                    </div>
+                    {item.book?.file_url && (
+                      <button
+                        type="button"
+                        className="btn !py-1 !text-xs"
+                        onClick={() => handleOpenDigitalBook(item.book)}
+                      >
+                        <Icons.BookMarked size={14} /> Baca
+                      </button>
+                    )}
                   </div>
+                  {!item.book?.file_url && (
+                    <div className="text-xs opacity-60">
+                      File digital belum tersedia. Hubungi petugas bila diperlukan.
+                    </div>
+                  )}
                 </div>
               )}
             />
