@@ -11,6 +11,7 @@ export default function Home({ user }) {
 
   const [filters, setFilters] = useState({ q: '', year: '', sort: 'title', digitalOnly: false })
   const [books, setBooks] = useState([])
+  const [page, setPage] = useState(1)
   const [catalogLoading, setCatalogLoading] = useState(false)
   const [catalogMeta, setCatalogMeta] = useState(null)
   const [refreshToken, setRefreshToken] = useState(0)
@@ -22,21 +23,47 @@ export default function Home({ user }) {
     return base
   }, [filters])
 
-  async function loadBooks() {
+  const currentPage = catalogMeta?.page ?? page
+  const totalPages = useMemo(() => {
+    if (!catalogMeta?.perPage || catalogMeta.total == null) return null
+    const perPage = catalogMeta.perPage || 1
+    const pages = Math.ceil(catalogMeta.total / perPage)
+    return pages > 0 ? pages : 1
+  }, [catalogMeta])
+
+  const canGoPrev = !catalogLoading && currentPage > 1
+  const canGoNext = !catalogLoading && totalPages ? currentPage < totalPages : false
+  const showPagination = Boolean(catalogMeta && totalPages)
+
+  async function loadBooks(targetPageArg = page) {
+    const targetPage = typeof targetPageArg === 'number' ? targetPageArg : page
     setCatalogLoading(true)
     try {
-      const { items, meta } = await fetchBooks(params)
+      const { items, meta } = await fetchBooks({ ...params, page: targetPage })
       const visible = filters.digitalOnly ? items.filter((item) => item.is_digital) : items
       setBooks(visible)
       setCatalogMeta(
         meta
           ? {
-              total: filters.digitalOnly ? visible.length : meta.total,
-              page: meta.page,
-              perPage: meta.perPage,
+              total: meta.total ?? visible.length,
+              page: meta.page ?? targetPage,
+              perPage: meta.perPage ?? (visible.length || 1),
+              displayTotal: filters.digitalOnly ? visible.length : (meta.total ?? visible.length),
+            }
+          : filters.digitalOnly
+          ? {
+              total: visible.length,
+              page: targetPage,
+              perPage: visible.length || 1,
+              displayTotal: visible.length,
             }
           : null
       )
+      if (meta?.page != null) {
+        setPage(meta.page)
+      } else {
+        setPage(targetPage)
+      }
     } catch (error) {
       console.error('Gagal memuat katalog', error)
     } finally {
@@ -48,6 +75,20 @@ export default function Home({ user }) {
     loadBooks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  function handleApplyFilters() {
+    loadBooks(1)
+  }
+
+  function handleNextPage() {
+    if (!canGoNext) return
+    loadBooks(currentPage + 1)
+  }
+
+  function handlePreviousPage() {
+    if (!canGoPrev) return
+    loadBooks(currentPage - 1)
+  }
 
   async function handleBorrow(book) {
     if (!user) {
@@ -107,7 +148,7 @@ export default function Home({ user }) {
           setYear={(year) => setFilters((prev) => ({ ...prev, year }))}
           sort={filters.sort}
           setSort={(sort) => setFilters((prev) => ({ ...prev, sort }))}
-          onApply={loadBooks}
+          onApply={handleApplyFilters}
           isDigitalOnly={filters.digitalOnly}
           setDigitalOnly={(digitalOnly) => setFilters((prev) => ({ ...prev, digitalOnly }))}
         />
@@ -139,8 +180,39 @@ export default function Home({ user }) {
         {!catalogLoading && books.length === 0 && (
           <p className="text-sm opacity-70">Tidak ada buku yang cocok dengan filter saat ini.</p>
         )}
+
+        {showPagination && (
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
+            <p className="opacity-70">
+              Halaman {currentPage} dari {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="btn !py-1.5 gap-1"
+                onClick={handlePreviousPage}
+                disabled={!canGoPrev}
+              >
+                <Icons.ChevronLeft size={16} />
+                Sebelumnya
+              </button>
+              <button
+                type="button"
+                className="btn !py-1.5 gap-1"
+                onClick={handleNextPage}
+                disabled={!canGoNext}
+              >
+                Berikutnya
+                <Icons.ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
         {catalogMeta?.total && (
-          <p className="text-xs opacity-60">Total koleksi saat ini: {catalogMeta.total} buku.</p>
+          <p className="text-xs opacity-60">
+            Total koleksi saat ini: {catalogMeta.displayTotal ?? catalogMeta.total} buku.
+          </p>
         )}
       </section>
 
