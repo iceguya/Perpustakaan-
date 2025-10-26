@@ -1,4 +1,4 @@
-Berikut draft **README.md** yang cocok untuk repositori GitHub kamu [`iceguya/Perpustakaan-`](https://github.com/iceguya/Perpustakaan-). Sudah disusun rapi seperti proyek full-stack modern berbasis Laravel dan React.
+
 
 ---
 
