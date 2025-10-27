@@ -132,9 +132,10 @@ Proyek ini dilisensikan di bawah [MIT License](LICENSE).
 ---
 
 ## 🌐 Preview
+Langsung liat aja kalau preview 
 
-Akan ditambahkan setelah deployment ke hosting / Vercel / Render.
-
+Link Video Youtube
+https://youtu.be/9tm2bK4Il3w?si=xOoGYNcSWatu2Jtg
 ---
 
 > 📘 “Sistem perpustakaan yang baik bukan hanya menyimpan buku, tapi juga menyimpan semangat belajar.”
